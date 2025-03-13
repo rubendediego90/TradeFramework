@@ -63,7 +63,7 @@ class DataProvider():
             bars['time'] = pd.to_datetime(bars['time'], unit='s')
             bars.set_index('time', inplace=True)
             
-          # Cambiamos nombres de columnas y las reorganizamos
+            # Cambiamos nombres de columnas y las reorganizamos
             bars.rename(columns={'tick_volume': 'tickvol', 'real_volume': 'vol'}, inplace=True)
             bars = bars[['open', 'high', 'low', 'close', 'tickvol', 'vol', 'spread']]
             
@@ -73,7 +73,7 @@ class DataProvider():
             print(f"No se han recuperado los datos de la ultima vela {symbol} {timeframe}. MT5 error:{mt5.last_error()}, exception:{e}")
             
     #Recuperamos los datos de las ultimas n velas
-    def get_latests_closes_bars(self,symbol: str,timeframe:str, n_bars: int = 1) -> pd.DataFrame:
+    def get_latests_closed_bars(self,symbol: str,timeframe:str, n_bars: int = 1) -> pd.DataFrame:
         try:
             #Validaciones
             if mt5.symbol_info(symbol) is None : 
@@ -86,12 +86,14 @@ class DataProvider():
             num_bars = n_bars if n_bars > 0 else 1 # numero de velas que nos traemos
             
             #Convertir int a data time
-            bars = pd.DataFrame(mt5.copy_rates_from_pos(symbol, tf,from_position, num_bars)) 
-            bars.set_index('tie',inplace=True)#convertimos la columna time en indice
+            bars_np_array = mt5.copy_rates_from_pos(symbol, tf, from_position, num_bars)
+            bars = pd.DataFrame(bars_np_array)
+            bars['time'] = pd.to_datetime(bars['time'], unit='s')
+            bars.set_index('time', inplace=True)#convertimos la columna time en indice
             
             #Cambiar nombres de columnas y reordenar
-            bars.rename(columns={'tick_volumen':'tickvol','real_volumen':'vol'},inplace=True)
-            bars = bars[['open','high','low','close','tickvol','vol','spread']]
+            bars.rename(columns={'tick_volume': 'tickvol', 'real_volume': 'vol'}, inplace=True)
+            bars = bars[['open', 'high', 'low', 'close', 'tickvol', 'vol', 'spread']]
             
             if bars.empty : return pd.Series() #devolver serie vacia
             else: bars.iloc[-1] #devolver el ultimo de la serie
