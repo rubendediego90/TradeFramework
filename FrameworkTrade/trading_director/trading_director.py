@@ -1,5 +1,6 @@
 from data_provider.data_provider import DataProvider
-from events.events import DataEvent
+from signal_generator.interfaces.interface_signal_generator import ISignalGenerator
+from events.events import DataEvent,SignalEvent
 import queue
 from typing import Dict, Callable
 import time
@@ -7,23 +8,31 @@ from datetime import datetime
 
 class TradingDirector():
     
-    def __init__(self, events_queue: queue.Queue, data_provider : DataProvider):
+    def __init__(self, events_queue: queue.Queue, data_provider : DataProvider, signal_generator:ISignalGenerator):
         self.events_queue : queue.Queue = events_queue
         
         #Referencia de los modulos
         self.data_provider : DataProvider = data_provider
+        self.signal_generator : ISignalGenerator = signal_generator
         
         #Controlador de trading
         self.trading_controller: bool = True
         
         #Creacion del event handler
         self.event_handler: Dict[str, Callable] = {
-            "DATA":self._handle_data_event
+            "DATA":self._handle_data_event,
+            "SIGNAL":self._handle_signal_event
         }
         
     def _handle_data_event(self, event: DataEvent):
         #Gestionamos los eventos de dataEvent
-        print(f"Recibido nuevos datos de {event.symbol} - último precio de cierre:{event.data.close} ")
+        print(f"Recibido DATA EVENT {event.symbol} - último precio de cierre:{event.data.close} ")
+        self.signal_generator.generate_signal(event)
+        
+    def _handle_signal_event(self, event: SignalEvent):
+        #Procesar signal event
+        print(f"Recibido SIGNAL EVENT {event.signal} para {event.symbol}")
+        
         
     def date_print(self) -> str:
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S")    #dd/mm/aa hh:mm:ss
@@ -46,7 +55,7 @@ class TradingDirector():
                     self.trading_controller = False
                     print("error, evento nulo")
                     
-            time.sleep(1)# se ejecuta cada segundo
+            time.sleep(0.01)# se ejecuta cada segundo
         print("FIN")
         
     
