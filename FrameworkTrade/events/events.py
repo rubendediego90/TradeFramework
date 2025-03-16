@@ -5,6 +5,7 @@ import pandas as pd
 class EventType(str,Enum):
     DATA = "DATA"
     SIGNAL = "SIGNAL"
+    SIZING = "SIZING"
     
 class SignalType(str,Enum):
     BUY = "BUY"
@@ -34,3 +35,14 @@ class SignalEvent(BaseEvent):
     magic_number:int                            #id de estrategia
     sl:float                                    #por si necesitamos poner el cierre de velas anteriores 
     tp:float
+    
+class SizeEvent(BaseEvent):
+    event_type: EventType = EventType.SIZING
+    symbol:str
+    signal: SignalType                          # Compra o venta
+    target_order: OrderType = OrderType.MARKET  # pendiente o a mercado
+    target_price: float
+    magic_number:int                            #id de estrategia
+    sl:float                                    #por si necesitamos poner el cierre de velas anteriores 
+    tp:float
+    volume:float                                   #volumen 

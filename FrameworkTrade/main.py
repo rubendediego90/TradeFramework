@@ -3,11 +3,13 @@ from data_provider.data_provider import DataProvider
 from trading_director.trading_director import TradingDirector
 from signal_generator.signals.signal_ma_crossover import SignalMACrossover
 from queue import Queue
+from position_sizer.position_sizer import PositionSizer
+from position_sizer.properties.position_sizer_properties import MinSizingProps, FixedSizingProps
 
 if __name__ == "__main__":
    
    #Definición de variables necesarias para la estrategeia
-   symbols = ['EURUSD','BTCUSD','XAUUSD']
+   symbols = ['EURUSD','USDJPY','XAUUSD']
    timeframe = '1min'
    fast_ma_period = 25
    slow_ma_period = 50
@@ -25,6 +27,10 @@ if __name__ == "__main__":
                                         slow_period=slow_ma_period
                                         )
    
+   POSITION_SIZER = PositionSizer(events_queue=events_queue,
+                                  data_provider=DATA_PROVIDER,
+                                  sizing_properties=FixedSizingProps(volume=0.076))
+   
    #Creacjon del tradind directo y ejecucion del metodo principal
-   TRADING_DIRECTOR = TradingDirector(events_queue=events_queue,data_provider=DATA_PROVIDER, signal_generator=SIGNAL_GENERATOR)
+   TRADING_DIRECTOR = TradingDirector(events_queue=events_queue,data_provider=DATA_PROVIDER, signal_generator=SIGNAL_GENERATOR,position_sizer=POSITION_SIZER)
    TRADING_DIRECTOR.execute()
