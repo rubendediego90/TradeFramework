@@ -5,12 +5,14 @@ from signal_generator.signals.signal_ma_crossover import SignalMACrossover
 from queue import Queue
 from position_sizer.position_sizer import PositionSizer
 from position_sizer.properties.position_sizer_properties import MinSizingProps, FixedSizingProps
+from portoflio.portfolio import Portfolio
 
 if __name__ == "__main__":
    
    #Definición de variables necesarias para la estrategeia
    symbols = ['EURUSD','USDJPY','XAUUSD']
    timeframe = '1min'
+   magic_number = 1
    fast_ma_period = 25
    slow_ma_period = 50
    
@@ -20,8 +22,12 @@ if __name__ == "__main__":
    #Creación modulos principales
    CONNECT = PlatformConnector(symbol_list=symbols)
    DATA_PROVIDER = DataProvider(events_queue=events_queue,symbol_list=symbols, timeframe=timeframe)
+   
+   PORTFOLIO = Portfolio(magic_number=magic_number)
+   
    SIGNAL_GENERATOR = SignalMACrossover(events_queue=events_queue,
                                         data_provider=DATA_PROVIDER,
+                                        portfolio=PORTFOLIO,
                                         timeframe=timeframe,
                                         fast_period=fast_ma_period,
                                         slow_period=slow_ma_period

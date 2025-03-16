@@ -4,15 +4,17 @@ from queue import Queue
 from data_provider.data_provider import DataProvider
 from events.events import SignalEvent
 import pandas as pd
+from portoflio.portfolio import Portfolio
 
 class SignalMACrossover(ISignalGenerator):
     
-    def __init__(self,events_queue: Queue, data_provider:DataProvider,timeframe:str,fast_period:int,slow_period:int):
+    def __init__(self,events_queue: Queue, data_provider:DataProvider,portfolio:Portfolio, timeframe:str,fast_period:int,slow_period:int):
         self.events_queue = events_queue
         self.DATA_PROVIDER = data_provider
         self.fast_period = fast_period
         self.slow_period = slow_period
         self.timeframe = timeframe
+        self.portfolio = portfolio
         
         if self.fast_period >= self.slow_period:
             raise Exception(f"ERROR: el periodo rapido {self.fast_period} es mayor o igual al lento {self.slow_period} SignalMACrossover", )
@@ -38,18 +40,20 @@ class SignalMACrossover(ISignalGenerator):
         #recuperar los datos necesarios
         bars = self.DATA_PROVIDER.get_latests_closed_bars(symbol,self.timeframe,self.slow_period) # pasamos el mayor porque con mas velas luego traemos menos
         
+        #Recuperamos las posiciones abiertas por esta estrategia
+        open_positions = self.portfolio.get_number_of_strategy_open_positions_by_symbol(data_event.symbol)
+        
         #Calcular el valor de los indicadores
         fast_ma = bars['close'][-self.fast_period:].mean()
         slow_ma = bars['close'].mean()
         
         #Detectar una señal de compra
-        if fast_ma > slow_ma:
+        if open_positions['LONG'] == 0 and fast_ma > slow_ma:
             signal = "BUY"
             
-        elif slow_ma > fast_ma:
+        elif open_positions['SHORT'] == 0 and slow_ma > fast_ma:
             signal = "SELL"
             
-        
         else: signal = ""
         
     # Si tenemos señal, generamos SignalEvent y lo colocamos en la cola de Eventos
@@ -58,6 +62,6 @@ class SignalMACrossover(ISignalGenerator):
                                                 signal=signal,
                                                 target_order="MARKET",
                                                 target_price=0,
-                                                magic_number=1234,
+                                                magic_number=self.portfolio.magic_number,
                                                 sl=0.0,
                                                 tp=0.0)
