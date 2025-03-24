@@ -17,27 +17,29 @@ class EstrategiaCrucesMA(Strategy):
         self.smaSlow = self.I(sma, self.data.Close, self.sma_slow_data)
 
     def next(self):
-        # Señal de compra (long): smaQuick cruza por encima de smaSlow
-        if self.smaQuick[-1] > self.smaSlow[-1] and self.smaQuick[-2] <= self.smaSlow[-2]:  
-            self.position.close()  # Cerramos cualquier posición anterior
-            self.buy()  # Abrimos una posición larga
+        price = self.data.Close[-1]
+        
+        if crossover(self.smaSlow,self.smaSlow):
+            self.buy(sl=price)
+            
+        elif crossover(self.smaSlow,self.smaQuick):
+            self.sell()
 
-        # Señal de venta (short): smaQuick cruza por debajo de smaSlow
-        elif self.smaQuick[-1] < self.smaSlow[-1] and self.smaQuick[-2] >= self.smaSlow[-2]:
-            self.position.close()  # Cerramos cualquier posición anterior
-            self.sell()  # Abrimos una posición corta
-
-# Cargar datos históricos desde Yahoo Finance
+#****   VARIABLES   *****
 symbol = "ETH-USD"
-data = yf.download(symbol, start="2025-01-24", end="2025-03-23", interval="5m")
+time_bars = "5m"
+date_ini = "2025-01-24"
+date_end = "2025-03-23"
+#************************
+
+data = yf.download(symbol, start=date_ini, end=date_end, interval=time_bars)
 data.columns = [col[0] for col in data.columns]
 
 # Asegurarnos de que 'Date' es el índice
 data.index = pd.to_datetime(data.index)
 
 # Crear y ejecutar el backtest
-
-bt = Backtest(data, EstrategiaCrucesMA)
+bt = Backtest(data, EstrategiaCrucesMA,exclusive_orders=True) #con una orden nueva cierra las anteriores
 
 #Ejecutamos el backtest
 stats = bt.run()
