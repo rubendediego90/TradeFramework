@@ -3,7 +3,7 @@ import yfinance as yf
 import os
 from datetime import datetime, timedelta
 
-def download_data(symbol, time_bars,file_name, date_ini, date_end):
+def download_data(symbol, time_bars, file_name, date_ini, date_end):
     """
     Función para descargar los datos de Yahoo Finance y guardarlos en un archivo CSV.
     """
@@ -43,14 +43,17 @@ def getData(symbol, time_bars, file_name, date_ini=None, date_end=None, auto_dat
         # Si el archivo tiene más de 12 horas, descargamos los nuevos datos
         if time_diff > timedelta(hours=12):
             print(f"El archivo ha pasado más de 12 horas (última actualización hace {time_diff}), descargando nuevos datos...")
-            return download_data(symbol, date_ini, date_end, time_bars, file_name)
+            return download_data(symbol, time_bars, file_name, date_ini, date_end)
         else:
             print(f"Cargando datos desde el archivo existente (última actualización hace {time_diff})...")
             # Cargar los datos desde el archivo CSV, omitiendo cualquier fila no válida
             data = pd.read_csv(file_name, index_col=0, parse_dates=True)
 
+            # Asegurarse de que el índice sea de tipo fecha
+            data.index = pd.to_datetime(data.index, errors='coerce')
+            
             # Filtrar cualquier fila que no tenga un índice de fecha válido
-            data = data[pd.to_datetime(data.index, errors='coerce').notna()]
+            data = data[data.index.notna()]
 
             # Asegurarse de solo tener las columnas necesarias
             data = data[['Open', 'High', 'Low', 'Close', 'Volume']]
@@ -58,13 +61,11 @@ def getData(symbol, time_bars, file_name, date_ini=None, date_end=None, auto_dat
             # Eliminar la zona horaria de las fechas
             data.index = data.index.tz_localize(None)
             
-            # Asegurarnos de que 'Date' es el índice
-            data.index = pd.to_datetime(data.index)
-            
             return data
     else:
         # Si no existe el archivo, descargamos los datos
         print("El archivo no existe, descargando nuevos datos...")
-        return download_data(symbol, date_ini, date_end, time_bars, file_name)
+        return download_data(symbol, time_bars, file_name, date_ini, date_end)
+
 
 
