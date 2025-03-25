@@ -3,7 +3,7 @@ import yfinance as yf
 import os
 from datetime import datetime, timedelta
 
-def download_data(symbol, date_ini, date_end, time_bars, file_name):
+def download_data(symbol, time_bars,file_name, date_ini, date_end):
     """
     Función para descargar los datos de Yahoo Finance y guardarlos en un archivo CSV.
     """
@@ -20,11 +20,20 @@ def download_data(symbol, date_ini, date_end, time_bars, file_name):
     data.to_csv(file_name)
     return data
 
-def getData(symbol, date_ini, date_end, time_bars, file_name):
+def getData(symbol, time_bars, file_name, date_ini=None, date_end=None, auto_date=True):
     """
     Método para obtener los datos de Yahoo Finance o cargar desde un archivo CSV.
     Si el archivo tiene más de 12 horas, lo descarga de nuevo.
     """
+    
+    if auto_date:
+        # Si no se proporciona `date_ini`, se asigna la fecha actual
+        if date_ini is None:
+            date_ini = (datetime.today() - timedelta(days=59)).strftime('%Y-%m-%d')  # 59 días atrás
+        # Si no se proporciona `date_end`, se asigna la fecha actual
+        if date_end is None:
+            date_end = datetime.today().strftime('%Y-%m-%d')
+    
     # Verificar si el archivo existe
     if os.path.exists(file_name):
         # Obtener la fecha de creación del archivo
@@ -48,6 +57,9 @@ def getData(symbol, date_ini, date_end, time_bars, file_name):
             
             # Eliminar la zona horaria de las fechas
             data.index = data.index.tz_localize(None)
+            
+            # Asegurarnos de que 'Date' es el índice
+            data.index = pd.to_datetime(data.index)
             
             return data
     else:

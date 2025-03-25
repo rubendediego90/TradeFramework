@@ -39,23 +39,14 @@ if __name__ == '__main__':
     #****   VARIABLES   *****
     symbol = "CL=F"
     time_bars = "5m"
-    date_ini = "2025-01-25"
-    date_end = "2025-03-25"
+    #date_ini = "2025-01-25"
+    #date_end = "2025-03-25"
     #************************
-    
-    # Cargar datos
+
     # Obtener los datos
     file_name = f"data_{symbol}.csv"
-    data = getData(symbol, date_ini, date_end, time_bars, file_name)
-    
-    '''
-    data = yf.download(symbol, start=date_ini, end=date_end, interval=time_bars)
-    data.columns = [col[0] for col in data.columns]
-    '''
+    data = getData(symbol, time_bars, file_name) #,date_ini, date_end
 
-# Asegurarnos de que 'Date' es el índice
-    data.index = pd.to_datetime(data.index)
-    
     # Crear y ejecutar el backtest
     bt = Backtest(data, EstrategiaCrucesMA, exclusive_orders=True)
     
