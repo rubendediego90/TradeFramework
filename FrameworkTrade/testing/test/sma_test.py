@@ -30,7 +30,8 @@ class EstrategiaCrucesMA(Strategy):
 
 if __name__ == '__main__':
     #****   VARIABLES   *****
-    symbol = SYMBOL.EURO_USD
+    symbol = SYMBOL.LIBRA_USD
+    symbol_casted = SYMBOL.LIBRA_USD.name_str
     time_bars = TIMES_BARS.MIN_5
     #************************
     
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     
     # Optimizar
 
-    #optimizer = Optimizer(bt)
-    #optimizer.run()
+    optimizer = Optimizer(bt, symbol_casted=symbol_casted,name_strategy="SMA",text="Hola el resuemne de la prueba esta bien hecho")
+    optimizer.run()
+    #optimizer.set_folder_name(symbol_casted,'SMA')
 

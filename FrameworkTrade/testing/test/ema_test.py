@@ -38,7 +38,7 @@ class EstrategiaCruceema(Strategy):
 
 if __name__ == '__main__':
     #****   VARIABLES   *****
-    symbol = "GC=F"
+    symbol = "CL=F"
     time_bars = "5m"
     #************************
 
