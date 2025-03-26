@@ -6,10 +6,11 @@ from backtesting.lib import crossover
 from testing.utils.data_utils import getData
 from testing.utils.indicadores_utils import sma
 from testing.utils.optimize_utils import Optimizer
+from testing.types.types import SYMBOL,TIMES_BARS
 
 class EstrategiaCrucesMA(Strategy):
-    sma_quick_data=22
-    sma_slow_data=112
+    sma_quick_data=200
+    sma_slow_data=275
     stop_loss=0.95
     
     def init(self):
@@ -29,8 +30,8 @@ class EstrategiaCrucesMA(Strategy):
 
 if __name__ == '__main__':
     #****   VARIABLES   *****
-    symbol = "GC=F"
-    time_bars = "5m"
+    symbol = SYMBOL.EURO_USD
+    time_bars = TIMES_BARS.MIN_5
     #************************
     
     # Obtener los datos
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     data = getData(symbol, time_bars, file_name)
 
     # Crear y ejecutar el backtest
-    bt = Backtest(data, EstrategiaCrucesMA, exclusive_orders=True)
+    bt = Backtest(data, EstrategiaCrucesMA, exclusive_orders=True, cash=10000000000000000)
     
     # Ejecutar el backtest
     stats = bt.run()
@@ -48,6 +49,6 @@ if __name__ == '__main__':
     
     # Optimizar
 
-    optimizer = Optimizer(bt)
-    optimizer.run()
+    #optimizer = Optimizer(bt)
+    #optimizer.run()
 
