@@ -6,7 +6,7 @@ from backtesting.lib import crossover
 from testing.utils.data_utils import getData
 from testing.utils.indicadores_utils import sma
 from testing.utils.optimize_utils import Optimizer
-from testing.types.types import SYMBOL,TIMES_BARS
+from testing.types.types import SYMBOL,TIMES_BARS,STRATEGIES
 
 class EstrategiaCrucesMA(Strategy):
     sma_quick_data=206
@@ -30,10 +30,12 @@ class EstrategiaCrucesMA(Strategy):
 
 if __name__ == '__main__':
     #****   VARIABLES   *****
-    symbol = SYMBOL.LIBRA_USD
-    symbol_casted = SYMBOL.LIBRA_USD.name_str
+    symbol = SYMBOL.DAX
+    symbol_casted = SYMBOL.DAX.name_str
     time_bars = TIMES_BARS.MIN_5
     columns_csv_best= ['sma_quick', 'sma_slow', 'stop_loss', 'Profit Factor']
+    comment_readme ="Hola el resuemne de la prueba esta bien hecho"
+    name_strategy=STRATEGIES.SMA
     #************************
     
     # Obtener los datos
@@ -45,18 +47,14 @@ if __name__ == '__main__':
     
     # Ejecutar el backtest
     stats = bt.run()
-
-    # Ver los resultados del backtest
     print(stats)
-    stats["_trades"].to_csv('trades_output.csv', index=False)
     
     # Optimizar
-
     optimizer = Optimizer(
         bt, 
         symbol_casted=symbol_casted,
-        name_strategy="SMA",
-        text="Hola el resuemne de la prueba esta bien hecho",
+        name_strategy=name_strategy,
+        text=comment_readme,
         data=data,
         columns_csv_best=columns_csv_best)
     

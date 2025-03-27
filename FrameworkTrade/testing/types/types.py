@@ -20,4 +20,7 @@ class TIMES_BARS(str,Enum):
     MIN_5 = "5m"
     H_1 = "1h"
     
+class STRATEGIES(str,Enum):
+    SMA = "SMA"
+    
 
