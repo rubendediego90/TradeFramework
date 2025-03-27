@@ -9,9 +9,9 @@ from testing.utils.optimize_utils import Optimizer
 from testing.types.types import SYMBOL,TIMES_BARS
 
 class EstrategiaCrucesMA(Strategy):
-    sma_quick_data=200
-    sma_slow_data=275
-    stop_loss=0.95
+    sma_quick_data=206
+    sma_slow_data=47
+    stop_loss=0.9
     
     def init(self):
         self.smaQuick = self.I(sma, self.data.Close, self.sma_quick_data)
@@ -33,6 +33,7 @@ if __name__ == '__main__':
     symbol = SYMBOL.LIBRA_USD
     symbol_casted = SYMBOL.LIBRA_USD.name_str
     time_bars = TIMES_BARS.MIN_5
+    columns_csv_best= ['sma_quick', 'sma_slow', 'stop_loss', 'Profit Factor']
     #************************
     
     # Obtener los datos
@@ -47,10 +48,17 @@ if __name__ == '__main__':
 
     # Ver los resultados del backtest
     print(stats)
+    stats["_trades"].to_csv('trades_output.csv', index=False)
     
     # Optimizar
 
-    optimizer = Optimizer(bt, symbol_casted=symbol_casted,name_strategy="SMA",text="Hola el resuemne de la prueba esta bien hecho")
+    optimizer = Optimizer(
+        bt, 
+        symbol_casted=symbol_casted,
+        name_strategy="SMA",
+        text="Hola el resuemne de la prueba esta bien hecho",
+        data=data,
+        columns_csv_best=columns_csv_best)
+    
     optimizer.run()
-    #optimizer.set_folder_name(symbol_casted,'SMA')
 
